@@ -38,7 +38,7 @@ def smooth(vector):     # vector smooth
     ans[0] = vector[0]
     ans[vlen-1] = vector[vlen-1]
     for i in range(1,vlen-1):
-        ans[i] = 0.3*vector[i-1] + 0.4*vector[i] + 0.3*vector[i+1]
+        ans[i] = 0.2*vector[i-1] + 0.6*vector[i] + 0.2*vector[i+1]
     return ans
  
 if __name__ == '__main__':

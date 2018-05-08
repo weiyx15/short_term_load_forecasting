@@ -10,8 +10,9 @@ train and evaluate model
 ### main1
 do prediction
 ## data
-STLF_DATA_IN_1
-
+### STLF_DATA_IN_1.xls
 first page:   load data
 
 second page:  weather data
+### new_weights
+directory containing weights of 96 networks

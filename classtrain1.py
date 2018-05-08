@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Apr 22 16:33:01 2018
-
 @author: Wei Yuxuan
 @Course Project of LOAD PREDICT: Short-Term Load Forecasting (STLF)
-
 based on classtrain.py
 Revision: remove "today_t-1" data source from training and prediction
 DATA
 last_week_t, last_week_t-1, yesterday_t, yesterday_t-1
 and is_weekend_one_hot (1:weekday, 0:weekend) for yesterday, today
-
 """
 import numpy as np
 from keras import Sequential
@@ -31,7 +28,7 @@ class ANN96_1:
         self.model.add(Dense(1, activation=None))
         self.model.summary()
         # loss = mean squared error
-        sgd = optimizers.SGD(lr=0.5)
+        sgd = optimizers.SGD(lr=0.05)
         self.model.compile(optimizer=sgd, loss='mse', metrics=['mse'])
         # load data
         self.load = np.load('load.npy')
@@ -135,11 +132,16 @@ class ANN96_1:
                 elif index[i] % 7 == 3 or index[i] % 7 == 4:    # delete weekend
                     sw[i] = 0
             # train
-            history = self.model.fit\
-            (x, y, batch_size=32, epochs=self.nepoch, sample_weight=sw, verbose=0)
+            if j == 0:          # j=0, nepoch *= 10
+                history = self.model.fit\
+            (x, y, batch_size=32, epochs=10*self.nepoch, \
+             sample_weight=sw, verbose=0)
+            else:
+                history = self.model.fit\
+            (x, y, batch_size=32, epochs=self.nepoch,sample_weight=sw, verbose=1)
             # verbose=0, not to show training details
             # save model
-            self.model.save_weights(os.path.join('weights',str(j))+'.h5')
+            self.model.save_weights(os.path.join('new_weights',str(j))+'.h5')
             # evaluate model by mse
             mse = history.history['mean_squared_error']
             last_mse = mse[len(mse)-1]
@@ -186,7 +188,7 @@ class ANN96_1:
                     xp[0, k] = (xp[0, k] - self.loadmin)\
                     / (self.loadmax - self.loadmin)
             # predict
-            self.model.load_weights(os.path.join('weights',str(j)+'.h5'))
+            self.model.load_weights(os.path.join('new_weights',str(j)+'.h5'))
             prediction = self.model.predict(xp)
             prediction = \
             (self.loadmax - self.loadmin) * prediction + self.loadmin
